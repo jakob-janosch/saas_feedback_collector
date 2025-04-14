@@ -112,3 +112,5 @@ buildNumber.properties
 .classpath
 
 # End of https://www.toptal.com/developers/gitignore/api/macos,java,maven,angular
+
+backend/src/main/resources/application.properties

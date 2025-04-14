@@ -1,0 +1,10 @@
+amazon:
+  dynamodb:
+    endpoint: ${DYNAMODB_ENDPOINT:https://dynamodb.us-east-1.amazonaws.com}
+    region: ${AWS_REGION:us-east-1}
+
+logging:
+  level:
+    org.nextpertis: DEBUG
+    com.amazonaws: DEBUG
+    
