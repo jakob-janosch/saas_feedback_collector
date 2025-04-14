@@ -1,0 +1,12 @@
+version = 0.1
+[default]
+[default.deploy]
+[default.deploy.parameters]
+stack_name = "saas-feedback-collector"
+s3_bucket = "aws-sam-cli-managed-326443569749-samclisourcebucket"
+s3_prefix = "saas-feedback-collector"
+region = "eu-north-1"
+confirm_changeset = true
+capabilities = "CAPABILITY_IAM"
+parameter_overrides = "Environment=dev"
+image_repositories = [] 

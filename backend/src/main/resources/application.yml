@@ -1,7 +1,8 @@
 amazon:
   dynamodb:
-    endpoint: ${DYNAMODB_ENDPOINT:https://dynamodb.us-east-1.amazonaws.com}
-    region: ${AWS_REGION:us-east-1}
+    endpoint: ${DYNAMODB_ENDPOINT:https://dynamodb.eu-north-1.amazonaws.com}
+    region: ${APP_AWS_REGION:eu-north-1}
+    table-name: ${DYNAMODB_TABLE:Feedback-dev}
 
 logging:
   level:

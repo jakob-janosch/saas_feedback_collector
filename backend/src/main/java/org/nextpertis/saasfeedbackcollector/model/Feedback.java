@@ -18,8 +18,9 @@ import java.time.Instant;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@DynamoDBTable(tableName = "Feedback")
+@DynamoDBTable(tableName = "ignored") // This will be overridden
 public class Feedback {
+
     @NotBlank(message = "id is required")
     @DynamoDBHashKey
     private String id;

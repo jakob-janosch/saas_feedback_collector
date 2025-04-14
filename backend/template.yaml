@@ -1,0 +1,77 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: SAM template for SaaS Feedback Collector backend
+
+Parameters:
+  Environment:
+    Type: String
+    Default: dev
+    AllowedValues:
+      - dev
+      - prod
+    Description: Environment name
+
+Globals:
+  Function:
+    Runtime: java17
+    MemorySize: 512
+    Timeout: 30
+    Environment:
+      Variables:
+        DYNAMODB_ENDPOINT: !Sub https://dynamodb.${AWS::Region}.amazonaws.com
+        APP_AWS_REGION: !Ref AWS::Region
+        DYNAMODB_TABLE: !Ref FeedbackTable
+
+Resources:
+  FeedbackFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: org.nextpertis.saasfeedbackcollector.config.AsynchronousLambdaHandler::handleRequest
+      CodeUri: target/saasfeedbackcollector-0.0.1-SNAPSHOT.jar
+      Events:
+        ApiEvent:
+          Type: Api
+          Properties:
+            Path: /{proxy+}
+            Method: ANY
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref FeedbackTable
+        - Statement:
+            - Effect: Allow
+              Action:
+                - dynamodb:PutItem
+                - dynamodb:GetItem
+                - dynamodb:UpdateItem
+                - dynamodb:DeleteItem
+                - dynamodb:Scan
+                - dynamodb:Query
+                - dynamodb:BatchGetItem
+                - dynamodb:BatchWriteItem
+                - dynamodb:DescribeTable
+              Resource: 
+                - !GetAtt FeedbackTable.Arn
+                - !Sub "${FeedbackTable.Arn}/index/*"
+
+  FeedbackTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: !Sub Feedback-${Environment}
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions:
+        - AttributeName: id
+          AttributeType: S
+      KeySchema:
+        - AttributeName: id
+          KeyType: HASH
+      Tags:
+        - Key: Environment
+          Value: !Ref Environment
+
+Outputs:
+  ApiUrl:
+    Description: URL of the API endpoint
+    Value: !Sub https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/${Environment}/
+  FeedbackTableName:
+    Description: Name of the DynamoDB table
+    Value: !Ref FeedbackTable 
