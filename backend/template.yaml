@@ -21,11 +21,6 @@ Globals:
         DYNAMODB_ENDPOINT: !Sub https://dynamodb.${AWS::Region}.amazonaws.com
         APP_AWS_REGION: !Ref AWS::Region
         DYNAMODB_TABLE: !Ref FeedbackTable
-  Api:
-    Cors:
-      AllowMethods: "'GET,POST,PUT,DELETE,OPTIONS'"
-      AllowHeaders: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
-      AllowOrigin: "'*'"
 
 Resources:
   FeedbackFunction:
@@ -34,11 +29,29 @@ Resources:
       Handler: org.nextpertis.saasfeedbackcollector.config.AsynchronousLambdaHandler::handleRequest
       CodeUri: target/saasfeedbackcollector-0.0.1-SNAPSHOT.jar
       Events:
-        ApiEvent:
+        GetFeedbackById:
           Type: Api
           Properties:
-            Path: /{proxy+}
-            Method: ANY
+            Path: /feedback/{id}
+            Method: GET
+            RestApiId: !Ref FeedbackApi
+        GetFeedbacksByCategory:
+          Type: Api
+          Properties:
+            Path: /feedback
+            Method: GET
+            RestApiId: !Ref FeedbackApi
+        CreateFeedback:
+          Type: Api
+          Properties:
+            Path: /feedback
+            Method: POST
+            RestApiId: !Ref FeedbackApi
+        OptionsMethod:
+          Type: Api
+          Properties:
+            Path: /feedback
+            Method: OPTIONS
             RestApiId: !Ref FeedbackApi
       Policies:
         - DynamoDBCrudPolicy:
@@ -58,22 +71,6 @@ Resources:
               Resource: 
                 - !GetAtt FeedbackTable.Arn
                 - !Sub "${FeedbackTable.Arn}/index/*"
-      Events:
-        GetFeedbackById:
-          Type: Api
-          Properties:
-            Path: /feedback/{id}
-            Method: GET
-        GetFeedbacksByCategory:
-          Type: Api
-          Properties:
-            Path: /feedback
-            Method: GET
-        CreateFeedback:
-          Type: Api
-          Properties:
-            Path: /feedback
-            Method: POST
 
   FeedbackTable:
     Type: AWS::DynamoDB::Table
@@ -107,17 +104,18 @@ Resources:
         AllowMethods: "'GET,POST,PUT,DELETE,OPTIONS'"
         AllowHeaders: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
         AllowOrigin: "'*'"
+      Auth:
+        DefaultAuthorizer: NONE
+      EndpointConfiguration: REGIONAL
+      TracingEnabled: true
 
 Outputs:
   ApiUrl:
     Description: URL of the API endpoint
-    Value: !Sub https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/${Environment}/
+    Value: !Sub https://${FeedbackApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/
   FeedbackTableName:
     Description: DynamoDB Table Name
     Value: !Ref FeedbackTable
   FeedbackTableArn:
     Description: DynamoDB Table ARN
-    Value: !GetAtt FeedbackTable.Arn
-  FeedbackApi:
-    Description: API Gateway endpoint URL
-    Value: !Sub "https://${FeedbackApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/" 
+    Value: !GetAtt FeedbackTable.Arn 
