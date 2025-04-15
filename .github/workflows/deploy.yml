@@ -1,0 +1,102 @@
+name: Deploy Application
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy-backend:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./backend
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set up JDK 17
+      uses: actions/setup-java@v3
+      with:
+        java-version: '17'
+        distribution: 'temurin'
+        cache: maven
+
+    - name: Build with Maven
+      run: mvn clean package
+
+    - name: Set up Python for SAM CLI
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.9'
+
+    - name: Install AWS SAM CLI
+      run: pip install aws-sam-cli
+
+    - name: Configure AWS Credentials
+      uses: aws-actions/configure-aws-credentials@v4
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: eu-north-1
+
+    - name: SAM Deploy
+      run: |
+        sam deploy \
+          --no-confirm-changeset \
+          --no-fail-on-empty-changeset \
+          --stack-name saas-feedback-collector \
+          --config-file samconfig.toml \
+          --capabilities CAPABILITY_IAM
+
+  deploy-frontend:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./frontend
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set up Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '18'
+        cache: 'npm'
+        cache-dependency-path: './frontend/package-lock.json'
+
+    - name: Install dependencies
+      run: npm ci
+
+    - name: Build
+      run: npm run build --configuration=production
+      env:
+        API_URL: ${{ secrets.API_URL }}
+
+    - name: Configure AWS Credentials
+      uses: aws-actions/configure-aws-credentials@v4
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: eu-north-1
+
+    - name: Deploy to S3
+      run: |
+        aws s3 sync ./dist/frontend s3://${{ secrets.S3_BUCKET_NAME }} --delete
+        aws cloudfront create-invalidation --distribution-id ${{ secrets.CLOUDFRONT_DISTRIBUTION_ID }} --paths "/*"
+
+    - name: Notify deployment status
+      if: always()
+      uses: actions/github-script@v6
+      with:
+        script: |
+          const status = '${{ job.status }}'.toLowerCase();
+          const emoji = status === 'success' ? '✅' : '❌';
+          const message = `${emoji} Deployment ${status}\n
+          Branch: ${process.env.GITHUB_REF_NAME}\n
+          Commit: ${process.env.GITHUB_SHA.slice(0, 7)}`;
+          
+          github.rest.issues.createComment({
+            issue_number: context.issue.number,
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            body: message
+          }); 
