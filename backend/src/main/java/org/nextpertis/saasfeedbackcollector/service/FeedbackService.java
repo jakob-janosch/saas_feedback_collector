@@ -1,22 +1,14 @@
 package org.nextpertis.saasfeedbackcollector.service;
 
-import lombok.RequiredArgsConstructor;
+import org.nextpertis.saasfeedbackcollector.dto.FeedbackRequest;
 import org.nextpertis.saasfeedbackcollector.model.Feedback;
-import org.nextpertis.saasfeedbackcollector.repository.FeedbackRepository;
-import org.springframework.stereotype.Service;
 
-import java.time.Instant;
+import java.util.List;
 
-@Service
-@RequiredArgsConstructor
-public class FeedbackService {
-    private final FeedbackRepository feedbackRepository;
+public interface FeedbackService {
+    Feedback createFeedback(FeedbackRequest feedbackRequest);
 
-    public Feedback saveFeedback(Feedback feedback) {
-        if (feedback.getTimestamp() == null) {
-            feedback.setTimestamp(Instant.now());
-        }
+    Feedback getFeedbackById(String id);
 
-        return feedbackRepository.save(feedback);
-    }
+    List<Feedback> getFeedbacksByCategory(String category);
 } 
