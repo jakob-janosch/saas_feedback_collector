@@ -9,4 +9,6 @@ import java.util.List;
 @EnableScan
 public interface FeedbackRepository extends CrudRepository<Feedback, String> {
     List<Feedback> findByCategory(String category);
+
+    List<Feedback> findAll();
 }

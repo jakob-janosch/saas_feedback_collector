@@ -30,7 +30,7 @@ public class FeedbackController {
     }
 
     @GetMapping
-    public ResponseEntity<List<Feedback>> getFeedbacksByCategory(@RequestParam String category) {
+    public ResponseEntity<List<Feedback>> getFeedbacksByCategory(@RequestParam(required = false) String category) {
         List<Feedback> feedbacks = feedbackService.getFeedbacksByCategory(category);
         return ResponseEntity.ok(feedbacks);
     }

@@ -1,0 +1,79 @@
+<div class="app-container">
+  <header class="app-header">
+    <div class="header-content">
+      <div class="header-title">
+        <mat-icon class="logo-icon">forum</mat-icon>
+        <div class="title-text">
+          <h1>Feedback Dashboard</h1>
+          <span class="subtitle">Collect and manage user feedback</span>
+        </div>
+      </div>
+      <button mat-raised-button color="primary" (click)="openSubmitDialog()">
+        <mat-icon>add</mat-icon>
+        Submit Feedback
+      </button>
+    </div>
+  </header>
+
+  <div class="content-container">
+    <div class="filters">
+      <mat-form-field appearance="outline" subscriptSizing="dynamic">
+        <mat-label>Filter by Category</mat-label>
+        <mat-select
+          [(ngModel)]="selectedCategory"
+          (selectionChange)="loadFeedbacks()"
+        >
+          <mat-option
+            *ngFor="let category of categories"
+            [value]="category.value"
+          >
+            {{ category.label }}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+    </div>
+
+    <div class="loading-container" *ngIf="isLoading">
+      <mat-spinner diameter="40"></mat-spinner>
+      <p>Loading feedbacks...</p>
+    </div>
+
+    <div class="error-container" *ngIf="error">
+      <mat-card>
+        <mat-card-content>
+          <mat-icon color="warn">error_outline</mat-icon>
+          {{ error }}
+        </mat-card-content>
+      </mat-card>
+    </div>
+
+    <div class="feedback-grid" *ngIf="!isLoading && !error">
+      <mat-card *ngFor="let feedback of feedbacks" class="feedback-card">
+        <div class="card-header">
+          <div
+            class="category-chip"
+            [ngClass]="'category-' + feedback.category.toLowerCase()"
+          >
+            {{ feedback.category | titlecase }}
+          </div>
+          <div class="timestamp">
+            <mat-icon>schedule</mat-icon>
+            {{ formatDate(feedback.timestamp) }}
+          </div>
+        </div>
+        <div class="card-content">
+          <p class="message">{{ feedback.message }}</p>
+          <div class="user-info">
+            <mat-icon>person_outline</mat-icon>
+            <span>{{ feedback.userId }}</span>
+          </div>
+        </div>
+      </mat-card>
+
+      <div *ngIf="feedbacks.length === 0" class="no-feedbacks">
+        <mat-icon>info_outline</mat-icon>
+        <span>No feedbacks found for the selected category.</span>
+      </div>
+    </div>
+  </div>
+</div>

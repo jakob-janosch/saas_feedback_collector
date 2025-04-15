@@ -1,0 +1,24 @@
+.feedback-dialog {
+  .mat-mdc-dialog-surface {
+    border-radius: 8px;
+  }
+
+  .mat-mdc-dialog-container {
+    padding: 0;
+  }
+}
+
+// Override Material form field styles for a lighter look
+.mat-mdc-form-field-appearance-outline {
+  .mdc-notched-outline {
+    --mdc-notched-outline-border-color: #e0e0e0;
+  }
+
+  &:hover .mdc-notched-outline {
+    --mdc-notched-outline-border-color: #bdbdbd;
+  }
+
+  &.mat-focused .mdc-notched-outline {
+    --mdc-notched-outline-border-color: #007bff;
+  }
+}

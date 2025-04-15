@@ -1,0 +1,192 @@
+:host {
+  display: block;
+}
+
+.feedback-form-container {
+  background: #ffffff;
+  border-radius: 8px;
+
+  h2 {
+    margin: 0;
+    padding: 20px 24px;
+    font-size: 20px;
+    font-weight: 500;
+    color: #1a1a1a;
+    background: #f8f9fa;
+    border-bottom: 1px solid #eee;
+  }
+}
+
+mat-dialog-content {
+  padding: 24px !important;
+  margin: 0;
+}
+
+.form-fields {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+
+  mat-form-field {
+    width: 100%;
+
+    ::ng-deep {
+      // Fix dropdown background and text colors
+      .mat-mdc-select-panel {
+        background: white !important;
+      }
+
+      .mat-mdc-option {
+        color: #1a1a1a !important;
+
+        &:hover {
+          background: rgba(0, 0, 0, 0.04) !important;
+        }
+
+        &.mat-mdc-option-selected {
+          background: rgba(0, 123, 255, 0.1) !important;
+        }
+      }
+
+      // Form field text colors
+      .mat-mdc-input-element,
+      .mat-mdc-select-value-text,
+      textarea {
+        color: #1a1a1a !important;
+      }
+
+      .mat-mdc-form-field-label {
+        color: #4a4a4a !important;
+      }
+    }
+
+    textarea {
+      min-height: 100px;
+      resize: vertical;
+    }
+  }
+}
+
+.error-message {
+  color: #dc3545;
+  font-size: 12px;
+  margin-top: 8px;
+}
+
+mat-dialog-actions {
+  padding: 16px 24px !important;
+  margin: 0 !important;
+  background: #f8f9fa;
+  border-top: 1px solid #eee;
+  gap: 12px;
+
+  button[type='submit'] {
+    &.mat-mdc-raised-button {
+      background: #007bff;
+      color: white;
+
+      // Darker disabled state
+      &:disabled {
+        background: #b0b0b0 !important;
+        color: #ffffff !important;
+        opacity: 0.8;
+      }
+    }
+  }
+}
+
+.submit-button-content {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 80px;
+}
+
+.spinner-container {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+// Global dropdown styles
+::ng-deep {
+  .mat-mdc-select-panel {
+    background-color: white !important;
+
+    .mat-mdc-option {
+      color: #1a1a1a !important;
+      background: white !important;
+
+      &:hover:not(.mat-mdc-option-disabled) {
+        background: rgba(0, 0, 0, 0.04) !important;
+      }
+
+      &.mat-mdc-option-selected:not(.mat-mdc-option-disabled) {
+        background: rgba(0, 123, 255, 0.1) !important;
+      }
+
+      .mdc-list-item__primary-text {
+        color: #1a1a1a !important;
+      }
+    }
+  }
+}
+
+// Override Material styles for form fields
+::ng-deep {
+  .mat-mdc-form-field {
+    // Label color when not focused
+    .mdc-floating-label {
+      color: #4a4a4a !important;
+    }
+
+    // Text color for all inputs
+    .mdc-text-field__input {
+      color: #1a1a1a !important;
+    }
+
+    // Outline color
+    .mdc-notched-outline {
+      border-color: #cccccc !important;
+    }
+
+    // Focused state
+    &.mat-focused {
+      .mdc-floating-label {
+        color: #007bff !important;
+      }
+      .mdc-notched-outline {
+        border-color: #007bff !important;
+      }
+    }
+  }
+}
+
+span.hidden {
+  opacity: 0;
+}
+
+// Add a subtle hover effect to form fields
+::ng-deep {
+  .mat-mdc-form-field:hover .mat-mdc-form-field-wrapper {
+    background: #f0f2f5;
+    transition: background-color 0.2s ease;
+  }
+
+  .mat-mdc-form-field-appearance-outline .mat-mdc-form-field-outline {
+    color: #dee2e6;
+  }
+
+  .mat-mdc-form-field.mat-focused .mat-mdc-form-field-outline {
+    color: #007bff;
+  }
+}
+
+// Dialog overlay background
+::ng-deep .mat-mdc-dialog-container {
+  --mdc-dialog-container-color: #ffffff;
+  border-radius: 8px !important;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1) !important;
+}

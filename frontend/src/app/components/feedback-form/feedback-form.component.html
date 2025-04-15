@@ -1,0 +1,82 @@
+<div class="feedback-form-container">
+  <h2 mat-dialog-title>Submit Feedback</h2>
+
+  <form [formGroup]="feedbackForm" (ngSubmit)="onSubmit()">
+    <mat-dialog-content>
+      <div class="form-fields">
+        <mat-form-field appearance="outline">
+          <mat-label>User ID</mat-label>
+          <input
+            matInput
+            formControlName="userId"
+            placeholder="Enter your user ID"
+          />
+          <mat-error *ngIf="feedbackForm.get('userId')?.errors">
+            {{ getErrorMessage('userId') }}
+          </mat-error>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Category</mat-label>
+          <mat-select formControlName="category">
+            <mat-option
+              *ngFor="let category of data.categories"
+              [value]="category.value"
+            >
+              {{ category.label }}
+            </mat-option>
+          </mat-select>
+          <mat-error *ngIf="feedbackForm.get('category')?.errors">
+            {{ getErrorMessage('category') }}
+          </mat-error>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Message</mat-label>
+          <textarea
+            matInput
+            formControlName="message"
+            rows="4"
+            placeholder="Enter your feedback message"
+          ></textarea>
+          <mat-error *ngIf="feedbackForm.get('message')?.errors">
+            {{ getErrorMessage('message') }}
+          </mat-error>
+        </mat-form-field>
+      </div>
+
+      <div class="error-message" *ngIf="submitError">
+        {{ submitError }}
+      </div>
+    </mat-dialog-content>
+
+    <mat-dialog-actions align="end">
+      <button
+        mat-button
+        type="button"
+        (click)="onCancel()"
+        [disabled]="isSubmitting"
+      >
+        Cancel
+      </button>
+      <button
+        mat-raised-button
+        color="primary"
+        type="submit"
+        [disabled]="feedbackForm.invalid || isSubmitting"
+      >
+        <div class="submit-button-content">
+          <div class="spinner-container" *ngIf="isSubmitting">
+            <mat-progress-spinner
+              mode="indeterminate"
+              diameter="20"
+              color="accent"
+            >
+            </mat-progress-spinner>
+          </div>
+          <span [class.hidden]="isSubmitting">Submit</span>
+        </div>
+      </button>
+    </mat-dialog-actions>
+  </form>
+</div>

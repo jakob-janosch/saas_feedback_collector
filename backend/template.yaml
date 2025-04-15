@@ -21,6 +21,11 @@ Globals:
         DYNAMODB_ENDPOINT: !Sub https://dynamodb.${AWS::Region}.amazonaws.com
         APP_AWS_REGION: !Ref AWS::Region
         DYNAMODB_TABLE: !Ref FeedbackTable
+  Api:
+    Cors:
+      AllowMethods: "'GET,POST,PUT,DELETE,OPTIONS'"
+      AllowHeaders: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
+      AllowOrigin: "'*'"
 
 Resources:
   FeedbackFunction:
@@ -34,14 +39,15 @@ Resources:
           Properties:
             Path: /{proxy+}
             Method: ANY
+            RestApiId: !Ref FeedbackApi
       Policies:
         - DynamoDBCrudPolicy:
             TableName: !Ref FeedbackTable
         - Statement:
             - Effect: Allow
               Action:
-                - dynamodb:PutItem
                 - dynamodb:GetItem
+                - dynamodb:PutItem
                 - dynamodb:UpdateItem
                 - dynamodb:DeleteItem
                 - dynamodb:Scan
@@ -52,6 +58,22 @@ Resources:
               Resource: 
                 - !GetAtt FeedbackTable.Arn
                 - !Sub "${FeedbackTable.Arn}/index/*"
+      Events:
+        GetFeedbackById:
+          Type: Api
+          Properties:
+            Path: /feedback/{id}
+            Method: GET
+        GetFeedbacksByCategory:
+          Type: Api
+          Properties:
+            Path: /feedback
+            Method: GET
+        CreateFeedback:
+          Type: Api
+          Properties:
+            Path: /feedback
+            Method: POST
 
   FeedbackTable:
     Type: AWS::DynamoDB::Table
@@ -77,10 +99,25 @@ Resources:
         - Key: Environment
           Value: !Ref Environment
 
+  FeedbackApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Prod
+      Cors:
+        AllowMethods: "'GET,POST,PUT,DELETE,OPTIONS'"
+        AllowHeaders: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
+        AllowOrigin: "'*'"
+
 Outputs:
   ApiUrl:
     Description: URL of the API endpoint
     Value: !Sub https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/${Environment}/
   FeedbackTableName:
-    Description: Name of the DynamoDB table
-    Value: !Ref FeedbackTable 
+    Description: DynamoDB Table Name
+    Value: !Ref FeedbackTable
+  FeedbackTableArn:
+    Description: DynamoDB Table ARN
+    Value: !GetAtt FeedbackTable.Arn
+  FeedbackApi:
+    Description: API Gateway endpoint URL
+    Value: !Sub "https://${FeedbackApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/" 
